@@ -25,6 +25,14 @@ header {
     margin-bottom: 20px;
 }
 
+/* Style the title bar */
+.title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
 /* Style the scan button */
 .scan-button {
     background-color: #007acc;

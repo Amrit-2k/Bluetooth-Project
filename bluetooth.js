@@ -2,88 +2,64 @@ document.addEventListener("DOMContentLoaded", () => {
     const scanButton = document.getElementById("scanButton");
     const deviceList = document.getElementById("deviceList");
     const connectedDeviceDiv = document.getElementById("connectedDevice");
+    const deviceDataDiv = document.getElementById("deviceData");
+    const lineGraphCanvas = document.getElementById("lineGraph");
 
-    // Initialize an array to store connected devices
-    const connectedDevices = [];
+    // Placeholder for real-time line graph (you can use a charting library like Chart.js)
+    const lineGraphContext = lineGraphCanvas.getContext("2d");
 
     // Function to add a device to the connectedDevices array and update the UI
     function addConnectedDevice(device) {
-        connectedDevices.push(device);
-        const listItem = document.createElement("li");
-        listItem.textContent = `${device.name || "Unknown Device"} - ${device.id}`;
-        deviceList.appendChild(listItem);
+        // Code for connecting to the device and retrieving data goes here
+
+        // Simulated data (replace with actual data from your device)
+        const deviceInfo = `${device.name || "Unknown Device"} - ${device.id}`;
+        const deviceData = "Simulated ECG Data: 75, 78, 80, 82, 85, 88, 90, 92, 94, 96, 98, 100";
+
+        // Update the connected device info and device data
+        connectedDeviceDiv.textContent = deviceInfo;
+        deviceDataDiv.textContent = deviceData;
+
+        // Update the line graph (placeholder code)
+        updateLineGraph([75, 78, 80, 82, 85, 88, 90, 92, 94, 96, 98, 100]);
     }
 
-    // Function to display connected devices on page load
-    function displayConnectedDevices() {
-        // Sort devices based on whether they have a name or not
-        connectedDevices.sort((a, b) => {
-            const nameA = a.name || "Unknown Device";
-            const nameB = b.name || "Unknown Device";
+    // Placeholder function to update the line graph (replace with actual graphing library)
+    function updateLineGraph(data) {
+        // Clear the canvas
+        lineGraphContext.clearRect(0, 0, lineGraphCanvas.width, lineGraphCanvas.height);
 
-            // Devices with names other than "Unknown Device" come first
-            if (nameA !== "Unknown Device" && nameB === "Unknown Device") {
-                return -1;
-            } else if (nameA === "Unknown Device" && nameB !== "Unknown Device") {
-                return 1;
-            } else {
-                // If both have names or both are "Unknown Device", sort alphabetically
-                return nameA.localeCompare(nameB);
-            }
-        });
+        // Placeholder line graph drawing (replace with actual graphing library)
+        lineGraphContext.beginPath();
+        lineGraphContext.moveTo(0, 0);
 
-        // Clear the device list
-        deviceList.innerHTML = "";
+        const stepX = lineGraphCanvas.width / (data.length - 1);
+        const maxY = Math.max(...data);
+        const stepY = lineGraphCanvas.height / maxY;
 
-        // Add sorted devices to the UI
-        connectedDevices.forEach(device => {
-            addConnectedDevice(device);
-        });
+        for (let i = 0; i < data.length; i++) {
+            const x = i * stepX;
+            const y = lineGraphCanvas.height - data[i] * stepY;
+            lineGraphContext.lineTo(x, y);
+        }
+
+        lineGraphContext.stroke();
     }
 
-        // Event listener for the Scan button
+    // Event listener for the Scan button
     scanButton.addEventListener("click", async () => {
         try {
-            const device = await navigator.bluetooth.requestDevice({
+            const devices = await navigator.bluetooth.requestDevice({
                 acceptAllDevices: true,
             });
-
-            // Wrap the device object in an array or convert it to an array
-            const devices = Array.isArray(device) ? device : [device];
 
             devices.forEach(device => {
                 addConnectedDevice(device);
             });
 
-            // Display connected devices with sorting
-            displayConnectedDevices();
-
         } catch (error) {
             console.error("Bluetooth error:", error);
         }
     });
-    // Event listener for the Scan button
- 
-
-    // Function to display connected device information
-    function displayConnectedDevice(device) {
-        const deviceInfo = document.createElement("p");
-        deviceInfo.textContent = `Connected to: ${device.name || "Unknown Device"} - ${device.id}`;
-        connectedDeviceDiv.innerHTML = "";
-        connectedDeviceDiv.appendChild(deviceInfo);
-    }
-
-    // Handle device connection
-    async function connectToDevice(device) {
-        try {
-            const server = await device.gatt.connect();
-            // Perform further actions with the connected device here
-            displayConnectedDevice(device);
-        } catch (error) {
-            console.error("Bluetooth connection error:", error);
-        }
-    }
-
-    // Display connected devices on page load
-    displayConnectedDevices();
 });
+``

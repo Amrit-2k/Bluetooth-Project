@@ -10,12 +10,26 @@
             <h1>ECG Monitor</h1>
         </header>
         <section class="content">
-            <button id="scanButton" class="scan-button">Scan</button>
+            <div class="title-bar">
+                <h2>Bluetooth Devices</h2>
+                <button id="scanButton" class="scan-button">Scan</button>
+            </div>
             <div class="device-list">
                 <ul id="deviceList"></ul>
             </div>
             <div class="connected-device-info">
                 <div id="connectedDevice"></div>
+            </div>
+            <div class="data-row">
+                <div class="data">
+                    <h2>Device Data</h2>
+                    <p id="deviceData">No data available</p>
+                </div>
+                <div class="line-graph">
+                    <h2>Real-time Line Graph</h2>
+                    <!-- Placeholder for the line graph -->
+                    <canvas id="lineGraph" width="400" height="200"></canvas>
+                </div>
             </div>
         </section>
     </div>
