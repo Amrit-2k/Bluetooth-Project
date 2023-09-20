@@ -1,0 +1,15 @@
+/* styles.css */
+
+ul#deviceList {
+    display: flex;
+    flex-wrap: wrap;
+    list-style-type: none;
+    padding: 0;
+}
+
+li.device {
+    flex: 0 0 calc(33.33% - 10px); /* Three columns with a little spacing */
+    margin: 5px;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
