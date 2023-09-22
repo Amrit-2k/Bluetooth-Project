@@ -3,6 +3,8 @@
 <head>
     <title>Bluetooth ECG Monitor</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body>
     <div class="container">
@@ -14,15 +16,14 @@
                 <h2>Bluetooth Devices</h2>
                 <button id="scanButton" class="scan-button">Scan</button>
             </div>
-            <div class="device-list">
-                <ul id="deviceList"></ul>
-            </div>
             <div class="connected-device-info">
+                <!-- This div is updated dynamically by JavaScript -->
                 <div id="connectedDevice"></div>
             </div>
             <div class="data-row">
                 <div class="data">
                     <h2>Device Data</h2>
+                    <!-- This paragraph is updated dynamically by JavaScript -->
                     <p id="deviceData">No data available</p>
                 </div>
                 <div class="line-graph">
@@ -30,6 +31,18 @@
                     <!-- Placeholder for the line graph -->
                     <canvas id="lineGraph" width="400" height="200"></canvas>
                 </div>
+            </div>
+            <div class="data-options">
+                <h2>Data Update Speed</h2>
+                <!-- This input is used for adjusting data update speed -->
+                <input
+                    type="range"
+                    id="dataSpeedSlider"
+                    min="1"
+                    max="5"
+                    step="1"
+                    value="3"
+                />
             </div>
         </section>
     </div>

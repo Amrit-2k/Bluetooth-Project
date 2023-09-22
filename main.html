@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>BLE Receiver</title>
+</head>
+<body>
+  <h1>Received Random Number:</h1>
+  <p id="randomValue"></p>
+
+  <script>
+    async function connectToBluetoothDevice() {
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          filters: [{ services: ['4fafc201-1fb5-459e-8fcc-c5c9c331914b'] }],
+        });
+
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService('4fafc201-1fb5-459e-8fcc-c5c9c331914b');
+        const characteristic = await service.getCharacteristic('beb5483e-36e1-4688-b7f5-ea07361b26a8');
+
+        characteristic.addEventListener('characteristicvaluechanged', (event) => {
+          const randomValue = new TextDecoder().decode(event.target.value);
+          document.getElementById('randomValue').textContent = randomValue;
+        });
+
+        await characteristic.startNotifications();
+      } catch (error) {
+        console.error('Error connecting to Bluetooth device:', error);
+      }
+    }
+
+    connectToBluetoothDevice();
+  </script>
+</body>
+</html>

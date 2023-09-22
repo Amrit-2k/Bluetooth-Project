@@ -1,65 +1,150 @@
 document.addEventListener("DOMContentLoaded", () => {
     const scanButton = document.getElementById("scanButton");
-    const deviceList = document.getElementById("deviceList");
     const connectedDeviceDiv = document.getElementById("connectedDevice");
     const deviceDataDiv = document.getElementById("deviceData");
-    const lineGraphCanvas = document.getElementById("lineGraph");
+    const dataSpeedSlider = document.getElementById("dataSpeedSlider");
+    const gridIntervalInput = document.getElementById("gridInterval");
 
-    // Placeholder for real-time line graph (you can use a charting library like Chart.js)
-    const lineGraphContext = lineGraphCanvas.getContext("2d");
+    let connectedDevice = null;
+    let startTime = null;
+    let chart = null;
+    let dataUpdateSpeed = 300;
+    let gridInterval = 1000;
 
-    // Function to add a device to the connectedDevices array and update the UI
-    function addConnectedDevice(device) {
-        // Code for connecting to the device and retrieving data goes here
+    // Placeholder for simulated data
+    const simulatedData = [];
 
-        // Simulated data (replace with actual data from your device)
-        const deviceInfo = `${device.name || "Unknown Device"} - ${device.id}`;
-        const deviceData = "Simulated ECG Data: 75, 78, 80, 82, 85, 88, 90, 92, 94, 96, 98, 100";
+    // Flag to track whether the chart has been initialized
+    let isChartInitialized = false;
 
-        // Update the connected device info and device data
-        connectedDeviceDiv.textContent = deviceInfo;
-        deviceDataDiv.textContent = deviceData;
+    // Function to add a device and update the UI
+    async function addConnectedDevice(device) {
+        try {
+            // Connect to the device (replace with actual connection code)
+            // You might need to use device.gatt.connect() or similar depending on the device.
+            // Once connected, you can start receiving data.
 
-        // Update the line graph (placeholder code)
-        updateLineGraph([75, 78, 80, 82, 85, 88, 90, 92, 94, 96, 98, 100]);
+            // Simulated data (replace with actual data from your device)
+            connectedDevice = device;
+            const deviceInfo = `${device.name || "Unknown Device"} - ${device.id}`;
+            connectedDeviceDiv.textContent = deviceInfo;
+
+            // Set the start time when connected
+            startTime = Date.now();
+
+            // Initialize the chart if it hasn't been initialized yet
+            if (!isChartInitialized) {
+                initializeChart();
+                isChartInitialized = true;
+            }
+
+            // Start data updates (replace with actual data retrieval code)
+            updateChart();
+
+            console.log("Connected device:", device);
+        } catch (error) {
+            console.error("Error connecting to device:", error);
+        }
     }
 
-    // Placeholder function to update the line graph (replace with actual graphing library)
-    function updateLineGraph(data) {
-        // Clear the canvas
-        lineGraphContext.clearRect(0, 0, lineGraphCanvas.width, lineGraphCanvas.height);
+    // Simulated function to receive data from the connected device
+    function receiveData() {
+        // Simulated data (replace with actual data from your device)
+        return Math.random() * 10 + 80; // Simulated ECG data between 80 and 90
+    }
 
-        // Placeholder line graph drawing (replace with actual graphing library)
-        lineGraphContext.beginPath();
-        lineGraphContext.moveTo(0, 0);
+    // Function to initialize the chart
+    function initializeChart() {
+        chart = new Chart("lineGraph", {
+            type: "line",
+            data: {
+                datasets: [{
+                    label: "Voltage",
+                    data: simulatedData,
+                    borderColor: "rgba(75, 192, 192, 1)",
+                    borderWidth: 2,
+                    pointRadius: 0, // Hide data points
+                    fill: false,
+                }],
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: "linear",
+                        position: "bottom",
+                        title: {
+                            display: true,
+                            text: "Time (s)",
+                        },
+                        ticks: {
+                            stepSize: gridInterval / 1000, // Convert grid interval to seconds
+                        },
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: "Voltage",
+                        },
+                    },
+                },
+            },
+        });
+    }
 
-        const stepX = lineGraphCanvas.width / (data.length - 1);
-        const maxY = Math.max(...data);
-        const stepY = lineGraphCanvas.height / maxY;
+    // Function to update the chart with real-time data
+    function updateChart() {
+        const currentTime = (Date.now() - startTime) / 1000; // Convert to seconds
+        const newDataPoint = receiveData();
 
-        for (let i = 0; i < data.length; i++) {
-            const x = i * stepX;
-            const y = lineGraphCanvas.height - data[i] * stepY;
-            lineGraphContext.lineTo(x, y);
+        // Add the new data point to the simulated data array
+        simulatedData.push({ x: currentTime, y: newDataPoint });
+
+        // Remove old data points to keep the chart visually appealing
+        if (simulatedData.length > 100) {
+            simulatedData.shift();
         }
 
-        lineGraphContext.stroke();
+        // Update the chart data
+        chart.data.datasets[0].data = simulatedData;
+        chart.update();
+
+        // Schedule the next chart update
+        setTimeout(updateChart, dataUpdateSpeed);
     }
 
     // Event listener for the Scan button
     scanButton.addEventListener("click", async () => {
         try {
-            const devices = await navigator.bluetooth.requestDevice({
+            const device = await navigator.bluetooth.requestDevice({
                 acceptAllDevices: true,
             });
 
-            devices.forEach(device => {
-                addConnectedDevice(device);
-            });
-
+            addConnectedDevice(device);
         } catch (error) {
             console.error("Bluetooth error:", error);
         }
     });
+
+    // Event listener for data speed slider change
+    dataSpeedSlider.addEventListener("input", (event) => {
+        const value = parseInt(event.target.value);
+        // Update the data update speed based on the slider value
+        // Adjust this value as needed for your application
+        dataUpdateSpeed = 1000 / value;
+    });
+
+    // Event listener for grid interval input change
+    gridIntervalInput.addEventListener("input", (event) => {
+        const inputValue = parseInt(event.target.value);
+        if (inputValue >= 100 && inputValue <= 1000) {
+            gridInterval = inputValue;
+            updateGridInterval(inputValue);
+        }
+    });
+
+    // Function to update the grid interval
+    function updateGridInterval(interval) {
+        chart.options.scales.x.ticks.stepSize = interval / 1000;
+        chart.update();
+    }
 });
-``
